@@ -11,29 +11,30 @@ export const Main = () => {
     const [currPage, setCurrPage] = useState(1)
     const dispatch = useDispatch()
     const {dataObj} = useSelector((store)=> store)
+    const baseUrl = `https://manageapartms.herokuapp.com`
 
     useEffect(() => {
-        let url = `http://localhost:7000/flats`
+        let url = `${baseUrl}/flats`
         dispatch(fetchData(url))
     }, [])
 
     async function filterBtn(base) {
         console.log(base)
-        let url = `http://localhost:7000/flats?q=filter&base=${base}`
+        let url = `${baseUrl}/flats?q=filter&base=${base}`
         dispatch(fetchData(url))
     }
     async function sortBtn(sort) {
-        let url = `http://localhost:7000/flats?q=sort&sort=${sort}`
+        let url = `${baseUrl}/flats?q=sort&sort=${sort}`
         dispatch(fetchData(url))
     }
     async function searchBtn(e) {
         e.preventDefault()
-        let url = `http://localhost:7000/flats?q=search&block=${block}`
+        let url = `${baseUrl}/flats?q=search&block=${block}`
         dispatch(fetchData(url))
     }
     async function pageChange(page){
         setCurrPage(page)
-        let url = `http://localhost:7000/flats?page=${page}`
+        let url = `${baseUrl}/flats?page=${page}`
         dispatch(fetchData(url))
     }
     return (

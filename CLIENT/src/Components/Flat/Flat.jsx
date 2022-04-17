@@ -8,8 +8,9 @@ import './flat.css'
 export const Flat = () => {
     const [residents, setResidents] = useState([])
     const { id } = useParams()
+    const baseUrl = `https://manageapartms.herokuapp.com`
     useEffect(()=>{
-        let url = `http://localhost:7000/flat/${id}`
+        let url = `${baseUrl}/flat/${id}`
         getData(url)
     },[])
 

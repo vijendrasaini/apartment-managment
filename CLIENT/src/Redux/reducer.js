@@ -1,15 +1,14 @@
-import { ADD_COUNTER, REDUCE_COUNTER } from "./actionTypes";
+import { fetchData } from "./action";
+import { FETCH_DATA } from "./actionTypes";
 
 const initialState = {
-    counter : 0
+    dataObj : { }
 }
 export const reducer = ( state = initialState, { type , payload})=>{
     switch(type){
-        case ADD_COUNTER:
-            return { ...state, counter : state.counter + payload}
-        case REDUCE_COUNTER:
-            return { ...state, counter : state.counter + payload}
-        default :
+        case FETCH_DATA:
+            return { ...state, dataObj : payload}
+        default : 
             return state
     }
 }

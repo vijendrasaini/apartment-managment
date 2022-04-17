@@ -3,7 +3,7 @@ const Flat = require('../models/flat.modal')
 
 const router = Router()
 
-router.post('', async(req, res)=>{
+router.post('/flat', async(req, res)=>{
     try {
         const flat = await Flat.create(req.body)
         return res
@@ -18,12 +18,22 @@ router.post('', async(req, res)=>{
     }
 })
 
-router.get('', async (req, res)=>{
+router.get('/flats', async (req, res)=>{
     try {
-        const flats = await Flat.find().lean().exec()
-        return res
-        .status(200)
-        .send(flats)
+            // req.query = {
+            //     q : 'search' || 'filter' || 'sort',
+
+            // }
+            const filter = {}
+            let flats = await Flat.find().lean().exec()
+            
+            // flats = req?.query?.sort &&  req.query.sort == 1 
+            if(req.query.q == 'sort'){
+                flats = req.query.sort == 1 ? flats.sort((a,b)=>(a.no - b.no)) : flats.sort((a,b)=>(-a.no + b.no))
+            }
+            return res
+            .status(200)
+            .send(flats)
     } catch (error) {
         return res
         .status(500)

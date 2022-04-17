@@ -1,2 +1,1 @@
-export const ADD_COUNTER = "ADD_COUNTER"
-export const REDUCE_COUNTER = "REDUX_COUNTER"
+export const FETCH_DATA = "FETCH_DATA"

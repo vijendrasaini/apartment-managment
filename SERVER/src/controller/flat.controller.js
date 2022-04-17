@@ -20,17 +20,21 @@ router.post('/flat', async(req, res)=>{
 
 router.get('/flats', async (req, res)=>{
     try {
-            // req.query = {
-            //     q : 'search' || 'filter' || 'sort',
-
-            // }
+            
             const filter = {}
             let flats = await Flat.find().lean().exec()
             
             // flats = req?.query?.sort &&  req.query.sort == 1 
             if(req.query.q == 'sort'){
                 flats = req.query.sort == 1 ? flats.sort((a,b)=>(a.no - b.no)) : flats.sort((a,b)=>(-a.no + b.no))
+                // http://localhost:7000/flats?q=sort&sort=-1
             }
+            else if(req.query.q == 'filter'){
+                // const filterReason = req.query.base
+                console.log({ query : req.query})
+                flats = flats.filter(flat => flat.type == req.query.base)
+            }
+
             return res
             .status(200)
             .send(flats)

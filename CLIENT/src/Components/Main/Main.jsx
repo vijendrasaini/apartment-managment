@@ -1,34 +1,40 @@
 import { useEffect } from 'react'
-import axios from 'axios'
-import './main.css'
+import './main.css' 
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
+import {useDispatch, useSelector} from 'react-redux'
+import { fetchData } from '../../Redux/action'
 
 export const Main = () => {
 
-    const [flats, setFlats] = useState([])
     const [block, setBlock] = useState("")
-    useEffect(()=>{
-        let url = `http://localhost:7000/flats`
-        getData(url)
-    },[])
+    const [currPage, setCurrPage] = useState(1)
+    const dispatch = useDispatch()
+    const {dataObj} = useSelector((store)=> store)
 
-    async function getData(url){
-        const res = await axios.get(url)
-        setFlats(res.data.flats)
-    } 
-    async function filterBtn(base){
+    useEffect(() => {
+        let url = `http://localhost:7000/flats`
+        dispatch(fetchData(url))
+    }, [])
+
+    async function filterBtn(base) {
+        console.log(base)
         let url = `http://localhost:7000/flats?q=filter&base=${base}`
-        getData(url)
+        dispatch(fetchData(url))
     }
-    async function sortBtn(sort){
+    async function sortBtn(sort) {
         let url = `http://localhost:7000/flats?q=sort&sort=${sort}`
-        getData(url)
+        dispatch(fetchData(url))
     }
-    async function searchBtn(e){
+    async function searchBtn(e) {
         e.preventDefault()
         let url = `http://localhost:7000/flats?q=search&block=${block}`
-        getData(url)
+        dispatch(fetchData(url))
+    }
+    async function pageChange(page){
+        setCurrPage(page)
+        let url = `http://localhost:7000/flats?page=${page}`
+        dispatch(fetchData(url))
     }
     return (
         <>
@@ -41,12 +47,12 @@ export const Main = () => {
                     <div className="collapse navbar-collapse px-5" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <div className="dropdown px-5">
-                                <button  className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                     Filter
                                 </button>
                                 <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    <li><button onClick={()=>filterBtn("tenant")} className="dropdown-item" href="#">Tenant</button></li>
-                                    <li><button onClick={()=>filterBtn("owner")} className="dropdown-item" href="#">Owner</button></li>
+                                    <li><button onClick={() => filterBtn("tenant")} className="dropdown-item" href="#">Tenant</button></li>
+                                    <li><button onClick={() => filterBtn("owner")} className="dropdown-item" href="#">Owner</button></li>
                                 </ul>
                             </div>
                             <div className="dropdown px-5">
@@ -54,23 +60,27 @@ export const Main = () => {
                                     Sort
                                 </button>
                                 <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    <li><button onClick={()=>sortBtn(1)} className="dropdown-item" href="#">Low to High</button></li>
-                                    <li><button onClick={()=>sortBtn(-1)} className="dropdown-item" href="#">High to Low</button></li>
+                                    <li><button onClick={() => sortBtn(1)} className="dropdown-item" href="#">Low to High</button></li>
+                                    <li><button onClick={() => sortBtn(-1)} className="dropdown-item" href="#">High to Low</button></li>
                                 </ul>
                             </div>
                         </ul>
                         <form className="d-flex">
-                            <input onChange={(e)=>setBlock(e.target.value)} className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                            <input onChange={(e) => setBlock(e.target.value)} className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
                             <button onClick={searchBtn} className="btn btn-outline-success" type="submit">Search</button>
                         </form>
                     </div>
                 </div>
             </nav>
-
+            <div className="pagination">
+                <Link to="#">&laquo;</Link>
+                {dataObj?.totolPages?.map(page=> <Link to={""} key={page} className={page==currPage?"active": ""} onClick={()=>pageChange(page)}>{page}</Link>)}
+                <Link to="#">&raquo;</Link>
+            </div>
             <table id="customers" className='container'>
                 <thead>
                     <tr>
-                        <th>S.N.</th> 
+                        <th>S.N.</th>
                         <th>Type</th>
                         <th>Block</th>
                         <th>Flat Number</th>
@@ -79,16 +89,17 @@ export const Main = () => {
                     </tr>
                 </thead>
                 <tbody>
-                    {flats?.map((flat,index)=><tr key={index}>
-                                <td>{index+1}</td> 
-                                <td>{flat.type}</td>
-                                <td>{flat.block}</td>
-                                <td>{flat.no}</td>
-                                <td>{flat.residents.length}</td>
-                                <td><Link to={`/flat/${flat._id}`}>Click to know more</Link></td>
-                            </tr>)}
+                    {dataObj?.flats?.map((flat, index) => <tr key={index}>
+                        <td>{index + 1}</td>
+                        <td>{flat.type}</td>
+                        <td>{flat.block}</td>
+                        <td>{flat.no}</td>
+                        <td>{flat.residents.length}</td>
+                        <td><Link to={`/flat/${flat._id}`}>Click to know more</Link></td>
+                    </tr>)}
                 </tbody>
             </table>
+            
         </>
     )
 }

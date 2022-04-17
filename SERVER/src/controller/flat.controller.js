@@ -17,12 +17,27 @@ router.post('/flat', async(req, res)=>{
         })
     }
 })
+router.get('/flat/:id', async(req, res)=>{
+    try {
+        const flat = await Flat.findById(req.params.id).lean().exec()
+        return res
+        .status(200)
+        .send(flat)
+    } catch (error) {
+        return res
+        .status(500)
+        .send({
+            message : error.message
+        })
+    }
+})
 
 router.get('/flats', async (req, res)=>{
     try {
             const page = req.query.page || 1
             const limit = req.query.limit || 2
-            let flats = await Flat.find().skip((page - 1) * limit).limit(limit).lean().exec()
+            // let flats = await Flat.find().skip((page - 1) * limit).limit(limit).lean().exec()
+            let flats = await Flat.find().lean().exec()
             const totalDocs = await Flat.find().countDocuments()
             const totolPages = (Math.ceil(totalDocs/limit))
             if(req.query.q){

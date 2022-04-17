@@ -1,7 +1,35 @@
+import { useEffect } from 'react'
+import axios from 'axios'
 import './main.css'
+import { useState } from 'react'
+import { Link } from 'react-router-dom'
 
 export const Main = () => {
 
+    const [flats, setFlats] = useState([])
+    const [block, setBlock] = useState("")
+    useEffect(()=>{
+        let url = `http://localhost:7000/flats`
+        getData(url)
+    },[])
+
+    async function getData(url){
+        const res = await axios.get(url)
+        setFlats(res.data.flats)
+    } 
+    async function filterBtn(base){
+        let url = `http://localhost:7000/flats?q=filter&base=${base}`
+        getData(url)
+    }
+    async function sortBtn(sort){
+        let url = `http://localhost:7000/flats?q=sort&sort=${sort}`
+        getData(url)
+    }
+    async function searchBtn(e){
+        e.preventDefault()
+        let url = `http://localhost:7000/flats?q=search&block=${block}`
+        getData(url)
+    }
     return (
         <>
             <nav className="container navbar navbar-expand-lg navbar-light bg-light">
@@ -13,12 +41,12 @@ export const Main = () => {
                     <div className="collapse navbar-collapse px-5" id="navbarSupportedContent">
                         <ul className="navbar-nav me-auto mb-2 mb-lg-0">
                             <div className="dropdown px-5">
-                                <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                                <button  className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
                                     Filter
                                 </button>
                                 <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    <li><a className="dropdown-item" href="#">Tenant</a></li>
-                                    <li><a className="dropdown-item" href="#">Owner</a></li>
+                                    <li><button onClick={()=>filterBtn("tenant")} className="dropdown-item" href="#">Tenant</button></li>
+                                    <li><button onClick={()=>filterBtn("owner")} className="dropdown-item" href="#">Owner</button></li>
                                 </ul>
                             </div>
                             <div className="dropdown px-5">
@@ -26,26 +54,40 @@ export const Main = () => {
                                     Sort
                                 </button>
                                 <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
-                                    <li><a className="dropdown-item" href="#">Low to High</a></li>
-                                    <li><a className="dropdown-item" href="#">High to Low</a></li>
+                                    <li><button onClick={()=>sortBtn(1)} className="dropdown-item" href="#">Low to High</button></li>
+                                    <li><button onClick={()=>sortBtn(-1)} className="dropdown-item" href="#">High to Low</button></li>
                                 </ul>
                             </div>
                         </ul>
                         <form className="d-flex">
-                            <input className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
-                            <button className="btn btn-outline-success" type="submit">Search</button>
+                            <input onChange={(e)=>setBlock(e.target.value)} className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
+                            <button onClick={searchBtn} className="btn btn-outline-success" type="submit">Search</button>
                         </form>
                     </div>
                 </div>
             </nav>
 
             <table id="customers" className='container'>
-                <tr>
-                    <th>S.N.</th> 
-                    <th>Type</th>
-                    <th>Block</th>
-                    <th>Totol Residents</th>
-                </tr>
+                <thead>
+                    <tr>
+                        <th>S.N.</th> 
+                        <th>Type</th>
+                        <th>Block</th>
+                        <th>Flat Number</th>
+                        <th>Totol Residents</th>
+                        <th>More</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {flats?.map((flat,index)=><tr key={index}>
+                                <td>{index+1}</td> 
+                                <td>{flat.type}</td>
+                                <td>{flat.block}</td>
+                                <td>{flat.no}</td>
+                                <td>{flat.residents.length}</td>
+                                <td><Link to={`/flat/${flat._id}`}>Click to know more</Link></td>
+                            </tr>)}
+                </tbody>
             </table>
         </>
     )

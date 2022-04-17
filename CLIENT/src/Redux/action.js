@@ -1,6 +1,12 @@
-import { ADD_COUNTER, REDUCE_COUNTER } from "./actionTypes"
+import axios from "axios"
+import { FETCH_DATA } from "./actionTypes"
 
 
 
-export const addCounter = (payload)=>({ type : ADD_COUNTER, payload})
-export const reduceCounter = (payload)=>({ type : REDUCE_COUNTER, payload})
+export const setData = (payload)=>({ type : FETCH_DATA, payload})
+
+export const fetchData = (url) => async (dispatch)=>{
+    const res = await axios.get(url)
+    const data = res.data
+    dispatch(setData(data))
+}

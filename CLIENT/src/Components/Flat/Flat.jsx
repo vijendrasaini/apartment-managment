@@ -1,23 +1,21 @@
 import axios from "axios"
 import { useEffect } from "react"
 import { useState } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import { useParams } from "react-router-dom"
+import { fetchResidents } from "../../Redux/action"
 import './flat.css'
 
 
 export const Flat = () => {
-    const [residents, setResidents] = useState([])
     const { id } = useParams()
+    const dispatch = useDispatch()
     const baseUrl = `https://manageapartms.herokuapp.com`
+    const {residents } = useSelector(store => store)
     useEffect(()=>{
         let url = `${baseUrl}/flat/${id}`
-        getData(url)
+        dispatch(fetchResidents(url))
     },[])
-
-    async function getData(url){
-        const res = await axios.get(url)
-        setResidents(res.data.residents)
-    } 
     return (
         <>
             <h3 className="mt-5 mb-2 my-heading">Information about All Residents</h3>

@@ -2,12 +2,15 @@ import { useState } from 'react'
 import axios from 'axios'
 import './account.css'
 import { useNavigate } from 'react-router-dom'
+import { setAuth } from '../../Redux/action'
+import { useDispatch } from 'react-redux'
 
 export const Account = () => {
 
     const baseUrl = `https://manageapartms.herokuapp.com`
     // const baseUrl = `http://localhost:7000`
     const navigate = useNavigate()
+    const dispatch = useDispatch()
     const dummyUser = {
         email : "",
         password : ""
@@ -33,6 +36,7 @@ export const Account = () => {
             return alert('Wrong credentials')
         setUser(dummyUser)
         localStorage.setItem('token', JSON.stringify(response.token))
+        dispatch(setAuth(true))
         navigate('/')
     }
     

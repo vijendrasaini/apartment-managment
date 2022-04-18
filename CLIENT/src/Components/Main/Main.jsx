@@ -1,20 +1,20 @@
 import { useEffect } from 'react'
-import './main.css' 
+import './main.css'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import {useDispatch, useSelector} from 'react-redux'
-import { fetchData } from '../../Redux/action'
+import { useDispatch, useSelector } from 'react-redux'
+import { fetchData, setAuth } from '../../Redux/action'
 import { useNavigate } from 'react-router-dom'
 
 export const Main = () => {
 
     const navigate = useNavigate()
     const tokenStr = localStorage.getItem('token')
-    const token = tokenStr ? JSON.parse(tokenStr): navigate('/login')
+    const token = tokenStr ? JSON.parse(tokenStr) : navigate('/login')
     const [block, setBlock] = useState("")
     const [currPage, setCurrPage] = useState(1)
     const dispatch = useDispatch()
-    const {dataObj} = useSelector((store)=> store)
+    const { dataObj, loding } = useSelector((store) => store)
     const baseUrl = `https://manageapartms.herokuapp.com`
     // const baseUrl = `http://localhost:7000`
 
@@ -27,6 +27,7 @@ export const Main = () => {
         console.log(base)
         let url = `${baseUrl}/flats?q=filter&base=${base}`
         dispatch(fetchData(url))
+
     }
     async function sortBtn(sort) {
         let url = `${baseUrl}/flats?q=sort&sort=${sort}`
@@ -37,12 +38,16 @@ export const Main = () => {
         let url = `${baseUrl}/flats?q=search&block=${block}`
         dispatch(fetchData(url))
     }
-    async function pageChange(page){
+    async function pageChange(page) {
         setCurrPage(page)
         let url = `${baseUrl}/flats?page=${page}`
         dispatch(fetchData(url))
     }
-    return (
+    function logout(){
+        localStorage.removeItem('token')
+        dispatch(setAuth(false))
+    }
+    return loding ? (
         <>
             <nav className="container navbar navbar-expand-lg navbar-light bg-light">
                 <div className="container-fluid">
@@ -74,13 +79,22 @@ export const Main = () => {
                         <form className="d-flex">
                             <input onChange={(e) => setBlock(e.target.value)} className="form-control me-2" type="search" placeholder="Search" aria-label="Search" />
                             <button onClick={searchBtn} className="btn btn-outline-success" type="submit">Search</button>
+                            <div className=" px-5">
+                                <button onClick={logout} className="btn btn-secondary" type="button" id=""  aria-expanded="false">
+                                    Logout
+                                </button>
+                                {/* <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <li><button onClick={() => filterBtn("tenant")} className="dropdown-item" href="#">Tenant</button></li>
+                                    <li><button onClick={() => filterBtn("owner")} className="dropdown-item" href="#">Owner</button></li>
+                                </ul> */}
+                            </div>
                         </form>
                     </div>
                 </div>
             </nav>
             <div className="pagination">
                 <Link to="#">&laquo;</Link>
-                {dataObj?.totolPages?.map(page=> <Link to={""} key={page} className={page==currPage?"active": ""} onClick={()=>pageChange(page)}>{page}</Link>)}
+                {dataObj?.totolPages?.map(page => <Link to={""} key={page} className={page == currPage ? "active" : ""} onClick={() => pageChange(page)}>{page}</Link>)}
                 <Link to="#">&raquo;</Link>
             </div>
             <table id="customers" className='container'>
@@ -105,7 +119,9 @@ export const Main = () => {
                     </tr>)}
                 </tbody>
             </table>
-            
+
         </>
+    ) : (
+        <div id="loader"></div>
     )
 }

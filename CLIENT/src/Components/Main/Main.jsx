@@ -4,14 +4,19 @@ import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {useDispatch, useSelector} from 'react-redux'
 import { fetchData } from '../../Redux/action'
+import { useNavigate } from 'react-router-dom'
 
 export const Main = () => {
 
+    const navigate = useNavigate()
+    const tokenStr = localStorage.getItem('token')
+    const token = tokenStr ? JSON.parse(tokenStr): navigate('/login')
     const [block, setBlock] = useState("")
     const [currPage, setCurrPage] = useState(1)
     const dispatch = useDispatch()
     const {dataObj} = useSelector((store)=> store)
     const baseUrl = `https://manageapartms.herokuapp.com`
+    // const baseUrl = `http://localhost:7000`
 
     useEffect(() => {
         let url = `${baseUrl}/flats`
